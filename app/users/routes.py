@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 
-from app.auth.auth import get_current_user_from_cookie, get_current_user
+from app.auth.auth import get_current_user_from_cookie
 from app.auth.schemas import UserSalaryPromotion
 from app.users.models import Users, UserCreate, UserResponse
 from app.database import async_session_maker
@@ -61,4 +61,3 @@ async def read_users_salary_promotion(current_user: Users = Depends(get_current_
         "salary": current_user.salary,
         "data_promotion": current_user.data_promotion
     }
-

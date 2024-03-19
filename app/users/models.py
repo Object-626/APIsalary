@@ -25,4 +25,3 @@ class UserResponse(BaseModel):
     salary: str
     data_promotion: str
 
-# Далее в вашем роутере нужно изменить возвращаемый тип на UserResponse

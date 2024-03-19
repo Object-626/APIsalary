@@ -2,15 +2,13 @@ from datetime import timedelta, datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from app.auth.token import create_access_token
 from app.auth.schemas import UserLogin
-from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
-from app.auth.schemas import Token
 from sqlalchemy.future import select
 from app.users.models import Users
 from app.database import async_session_maker
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from app.config import SECRET_KEY, ALGORITHM
+from app.config import settings
 from app.auth.schemas import TokenData
 
 
@@ -21,11 +19,9 @@ async def get_current_user_from_cookie(request: Request) -> Users:
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    # Extract the token part after "Bearer "
     actual_token = token.split(" ")[1] if len(token.split(" ")) > 1 else None
     if actual_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    # Now call the original get_current_user function with the extracted token.
     return await get_current_user(actual_token)
 
 
@@ -36,7 +32,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> Users:
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -76,7 +72,7 @@ async def login_for_access_token(response: Response, user_login: UserLogin = Dep
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
@@ -85,7 +81,7 @@ async def login_for_access_token(response: Response, user_login: UserLogin = Dep
         key="access_token",
         value=f"Bearer {access_token}",
         expires=access_token_expires.total_seconds(),
-        httponly=True  # Важно для безопасности, делает куку недоступной для клиентских скриптов
+        httponly=True
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
