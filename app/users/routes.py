@@ -1,14 +1,17 @@
-from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
+
+from app.auth.auth import get_current_user
+from app.auth.schemas import UserSalaryPromotion
 from app.users.models import Users, UserCreate, UserResponse
 from app.database import async_session_maker
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.future import select
-
 from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 router = APIRouter()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @router.post("/users/", response_model=UserResponse)
@@ -45,3 +48,16 @@ async def delete_user_by_email(user_email: str):
 
         # Подтверждаем удаление
         return {"detail": f"Пользователь с почтой {user_email} удалён"}
+
+
+@router.get("/me/", response_model=UserResponse)
+async def read_users_me(current_user: Users = Depends(get_current_user)):
+    return current_user
+
+
+@router.get("/users/me/salary-promotion", response_model=UserSalaryPromotion)
+async def read_users_salary_promotion(current_user: Users = Depends(get_current_user)):
+    return {
+        "salary": current_user.salary,
+        "data_promotion": current_user.data_promotion
+    }
