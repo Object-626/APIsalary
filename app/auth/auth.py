@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from app.auth.token import create_access_token
 from app.auth.schemas import UserLogin
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
@@ -15,6 +15,18 @@ from app.auth.schemas import TokenData
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+async def get_current_user_from_cookie(request: Request) -> Users:
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    # Extract the token part after "Bearer "
+    actual_token = token.split(" ")[1] if len(token.split(" ")) > 1 else None
+    if actual_token is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    # Now call the original get_current_user function with the extracted token.
+    return await get_current_user(actual_token)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> Users:
