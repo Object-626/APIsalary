@@ -9,7 +9,7 @@ from sqlalchemy.future import select
 from passlib.context import CryptContext
 
 
-router = APIRouter()
+router = APIRouter(tags=["Это БАЗА!"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

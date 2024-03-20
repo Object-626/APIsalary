@@ -49,7 +49,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> Users:
     return user
 
 
-router = APIRouter(tags=["auth"])
+router = APIRouter(tags=["Аутентификация"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
