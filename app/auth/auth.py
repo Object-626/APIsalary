@@ -63,7 +63,7 @@ async def authenticate_user(email: str, password: str):
     return False
 
 
-@router.post("/token")
+@router.post("/login")
 async def login_for_access_token(response: Response, user_login: UserLogin = Depends()):
     user = await authenticate_user(user_login.email, user_login.password)
     if not user:
@@ -85,3 +85,11 @@ async def login_for_access_token(response: Response, user_login: UserLogin = Dep
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
+async def get_current_active_admin(current_user: Users = Depends(get_current_user_from_cookie)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=400, detail="У вас нет доступа")
+    return current_user
+
+# @router.post("/logout")
+# async def logout_for_user()

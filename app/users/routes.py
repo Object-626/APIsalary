@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 
-from app.auth.auth import get_current_user_from_cookie
+from app.auth.auth import get_current_user_from_cookie, get_current_active_admin
 from app.auth.schemas import UserSalaryPromotion
 from app.users.models import Users, UserCreate, UserResponse
 from app.database import async_session_maker
@@ -14,13 +14,13 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-@router.post("/users/", response_model=UserResponse)
-async def create_user(user: UserCreate):
+@router.post("/users/", response_model=UserResponse, dependencies=[Depends(get_current_active_admin)])
+async def create_user(user: UserCreate = Depends()):
     hashed_password = pwd_context.hash(user.password)
 
     async with async_session_maker() as session:
         new_user = Users(email=user.email, hashed_password=hashed_password,
-                         salary=user.salary, data_promotion=user.data_promotion)
+                         salary=user.salary, data_promotion=user.data_promotion, role=user.role)
         session.add(new_user)
         try:
             await session.commit()
@@ -38,15 +38,11 @@ async def delete_user_by_email(user_email: str):
         result = await session.execute(query)
         user = result.scalars().first()
 
-        # Если пользователь не найден, возвращаем ошибку
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Такого пользователя нет")
 
-        # Если пользователь найден, удаляем его
         await session.delete(user)
         await session.commit()
-
-        # Подтверждаем удаление
         return {"detail": f"Пользователь с почтой {user_email} удалён"}
 
 
