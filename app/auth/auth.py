@@ -91,5 +91,7 @@ async def get_current_active_admin(current_user: Users = Depends(get_current_use
         raise HTTPException(status_code=400, detail="У вас нет доступа")
     return current_user
 
-# @router.post("/logout")
-# async def logout_for_user()
+
+@router.post("/logout")
+async def logout_user(response: Response):
+    response.delete_cookie("access_token")
