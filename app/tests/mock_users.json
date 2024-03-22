@@ -1,0 +1,16 @@
+[
+  {
+    "email": "Pasha@gmail.com",
+    "hashed_password":"test",
+    "salary":"20000",
+    "data_promotion": "2025-10-10",
+    "role": "user"
+  },
+  {
+    "email": "Adminchic@gmail.com",
+    "hashed_password":"admin",
+    "salary":"55000",
+    "data_promotion": "2024-10-10",
+    "role": "admin"
+  }
+]

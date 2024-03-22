@@ -3,6 +3,7 @@ from app.database import Base
 from pydantic import BaseModel, EmailStr
 from enum import Enum
 
+
 class Users(Base):
     __tablename__ = "users"
 
