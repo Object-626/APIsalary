@@ -1,14 +1,14 @@
 [
   {
     "email": "Pasha@gmail.com",
-    "hashed_password":"test",
+    "hashed_password":"$2b$12$CT.ov0L7SRJVbVrhdzIBPO1usGeYKmzsB8rGWOmfBVMI3R5gqIkyi",
     "salary":"20000",
     "data_promotion": "2025-10-10",
     "role": "user"
   },
   {
     "email": "Adminchic@gmail.com",
-    "hashed_password":"admin",
+    "hashed_password":"$2b$12$JTgYJ7C5cC3gysnasss0n.T5QMWIZ05i7bomne2Wdu4cvSrKvGJyO",
     "salary":"55000",
     "data_promotion": "2024-10-10",
     "role": "admin"
