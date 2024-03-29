@@ -1,6 +1,5 @@
-from httpx import AsyncClient
+
 from app.tests.conftest import ac
-import pytest
 from httpx import AsyncClient
 
 

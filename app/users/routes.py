@@ -1,5 +1,5 @@
+import asyncio
 from sqlalchemy.exc import IntegrityError
-from typing import List
 from app.auth.auth import get_current_user_from_cookie, get_current_active_admin
 from app.auth.schemas import UserSalaryPromotion
 from app.users.models import Users, UserCreate, UserResponse
@@ -7,6 +7,7 @@ from app.database import async_session_maker
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.future import select
 from passlib.context import CryptContext
+from fastapi_cache.decorator import cache
 
 
 router = APIRouter(tags=["Это БАЗА!"])
@@ -47,14 +48,17 @@ async def delete_user_by_email(user_email: str):
 
 
 @router.get("/me/", response_model=UserResponse)
+@cache(expire=30)
 async def read_users_me(current_user: Users = Depends(get_current_user_from_cookie)):
+    await asyncio.sleep(3)
     return current_user
 
 
 @router.get("/users/me/salary-promotion", response_model=UserSalaryPromotion)
+@cache(expire=30)
 async def read_users_salary_promotion(current_user: Users = Depends(get_current_user_from_cookie)):
+    await asyncio.sleep(3)
     return {
         "salary": current_user.salary,
         "data_promotion": current_user.data_promotion
     }
-
